@@ -1,10 +1,11 @@
 package chapter_2_4;
 
-import java.util.Comparator;
+import utils.StdIn;
+
 import java.util.NoSuchElementException;
 
 public class MaxPQ<Key extends Comparable<Key>> {
-    private Key[] pq;
+    private Key[] pq; // 基于堆得完全二叉树
     private int n;
 
     /**
@@ -16,6 +17,7 @@ public class MaxPQ<Key extends Comparable<Key>> {
 
     /**
      * 创建一个优先队列并设置其容量
+     *
      * @param initCapacity 优先队列的初始容量
      */
     public MaxPQ(int initCapacity) {
@@ -28,41 +30,40 @@ public class MaxPQ<Key extends Comparable<Key>> {
 
     /**
      * 向优先队列中插入一个元素
+     *
      * @param a 插入的元素
      */
     public void insert(Key a) {
         pq[++n] = a;
+        swim(n);
     }
 
     /**
      * 返回最大元素
+     *
      * @return 最大元素的索引
      */
-    public int max() {
-        int maxIndex = 1;
-        for (int i = 1; i < size()+1; i++) {
-            if (less(maxIndex, i)) {
-                maxIndex = i;
-            }
-        }
-        return maxIndex;
+    public Key max() {
+        return pq[1];
     }
 
     /**
      * 删除最大元素
+     *
      * @return 被删除的元素
      */
     public Key delMax() {
         if (isEmpty()) throw new NoSuchElementException("Priority queue underflow");
-        int maxIndex = max();
-        Key max = pq[maxIndex];
-        exch(maxIndex, n--);
-        pq[n+1] = null; // 垃圾回收
+        Key max = pq[1];
+        exch(1, n--);
+        pq[n + 1] = null; // 置空回收
+        sink(1);
         return max;
     }
 
     /**
      * 返回队列是否为空
+     *
      * @return
      */
     public boolean isEmpty() {
@@ -71,6 +72,7 @@ public class MaxPQ<Key extends Comparable<Key>> {
 
     /**
      * 返回优先队列中的元素个数
+     *
      * @return
      */
     public int size() {
@@ -80,7 +82,7 @@ public class MaxPQ<Key extends Comparable<Key>> {
     /***************************************************************************
      * Helper functions for compares and swaps.
      ***************************************************************************/
-    private boolean less(int i, int j){
+    private boolean less(int i, int j) {
         return pq[i].compareTo(pq[j]) < 0;
     }
 
@@ -90,14 +92,33 @@ public class MaxPQ<Key extends Comparable<Key>> {
         pq[j] = swap;
     }
 
-    public static void main(String[] arg) {
+    /***************************************************************************
+     * Helper functions to restore the heap invariant.
+     ***************************************************************************/
+    public void swim(int k) {
+        while (k > 1 && less(k / 2, k)) {
+            exch(k, k / 2);
+            k = k / 2;
+        }
+    }
+
+    public void sink(int k) {
+        while (2 * k <= n) { // 注意：这里2k <= N 说明k的子节点可能有1个或者2个，而如果2k < N 则子节点为2个
+            int j = k * 2;
+            if (j < n && less(j, j + 1)) j++; // 如果k的子节点只有一个就直接下一步。
+            if (!less(k, j)) break;
+            exch(k, j);
+            k = j;
+        }
+    }
+
+    public static void main(String[] args) {
         MaxPQ<String> maxPQ = new MaxPQ<>(10);
-        maxPQ.insert("a");
-        maxPQ.insert("b");
-        maxPQ.insert("c");
-        System.out.println(maxPQ.delMax());
-        maxPQ.insert("d");
-        maxPQ.insert("e");
+        while (StdIn.hasNextLine()) {
+            maxPQ.insert(new String(StdIn.readLine()));
+            if (maxPQ.size() > 8)
+                System.out.println(maxPQ.delMax());
+        }
     }
 
 }
