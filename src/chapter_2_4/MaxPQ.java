@@ -103,7 +103,7 @@ public class MaxPQ<Key extends Comparable<Key>> {
     }
 
     public void sink(int k) {
-        while (2 * k <= n) { // 注意：这里2k <= N 说明k的子节点可能有1个或者2个，而如果2k < N 则子节点为2个
+        while (2 * k <= n) { // 注意：这里2k <= N 说明k的子节点可能有1个或者2个，而如果2k < N 则子节点为2个, 2k == N 则子节点为1个（N为从1开始）
             int j = k * 2;
             if (j < n && less(j, j + 1)) j++; // 如果k的子节点只有一个就直接下一步。
             if (!less(k, j)) break;
