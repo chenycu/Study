@@ -52,6 +52,7 @@ public class MaxPQ<Key extends Comparable<Key>> {
      *
      * @return 被删除的元素
      */
+    @SuppressWarnings("Duplicates")
     public Key delMax() {
         if (isEmpty()) throw new NoSuchElementException("Priority queue underflow");
         Key max = pq[1];
